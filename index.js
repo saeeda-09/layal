@@ -1,4 +1,6 @@
 const express = require('express')
+const cookieParser = require('cookie-parser');
+const authRoutes = require('./routes/auth.route.js');
 const mongoose = require('mongoose');
 const Product = require('./models/product.model.js');
 const productRoute = require("./routes/product.route.js");
@@ -8,10 +10,12 @@ const app = express()
 
 //middleware
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({extended: false}));
 
 
 //routes
+app.use('/api/auth', authRoutes);
 app.use('/api/products',productRoute);
 app.use('/api/users', userRoute);
 
