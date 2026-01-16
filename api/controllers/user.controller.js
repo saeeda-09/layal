@@ -1,5 +1,5 @@
 const                    
-   User = require('../models/user.model'); // Import the new User model
+   User = require('../models/user.model'); 
    const { z } = require('zod');
 
    const userSchema = z.object({
@@ -11,7 +11,7 @@ const
          role: z.enum(['user', 'admin']).optional().default('user')
    });
 
-// Get all users
+
 const getUsers = async (req, res) => {
     try {
         const users = await User.find({});
@@ -21,7 +21,7 @@ const getUsers = async (req, res) => {
     }
 };
 
-// Get a single user by ID
+
 const getUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -32,10 +32,10 @@ const getUser = async (req, res) => {
     }
 };
 
-// Create a new user
+
 const createUser = async (req, res) => {
     try {
-        // You should add password hashing (e.g., using bcrypt) here for security!
+    
         const user = await User.create(req.body);
         res.status(200).json(user);
     } catch (error) {
@@ -43,7 +43,7 @@ const createUser = async (req, res) => {
     }
 };
 
-// Update a user
+
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -59,7 +59,6 @@ const updateUser = async (req, res) => {
     }
 };
 
-// Delete a user
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -82,77 +81,3 @@ module.exports = {
     updateUser,
     deleteUser
 };
-/*//const User = require('../models/user.model.js');
-//const { z } = require('zod');
-import User from '../models/user.model.js';
-import { z } from 'zod';
-const userSchema = z.object({
-    username: z.string().min(1, "Username is required"),
-    email: z.string().email("Invalid email address"),
-    age: z.number().min(0, "Age must be a non-negative number").optional(),
-    password: z.string().min(6, "Password must be at least 6 characters long"),
-    address: z.string().optional().default(""),
-    role: z.enum(['user', 'admin']).optional().default('user')
-});
-
-const getUsers = async (req, res) => {
-    try {
-        const users = await User.find({}); 
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-const getUser = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findById(id);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    } 
-};
-const createUser = async (req, res) => {
-    try {
-        const validatedData = userSchema.parse(req.body);
-        const user = await User.create(validatedData);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-const updateUser = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const validatedData = userSchema.partial().parse(req.body);
-        const updatedUser = await User.findByIdAndUpdate(id, validatedData, { new: true });
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found!" });
-        }
-        res.status(200).json(updatedUser);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-const deleteUser = async (req, res) => {   
-    try {
-        const { id } = req.params;
-        const user = await User.findByIdAndDelete(id);
-        if (!user) {
-            return res.status(404).json({ message: "User not found!" });
-        }
-        res.status(200).json({ message: "User deleted successfully!" });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }   
-};
-
-export {
-    getUsers,
-    getUser,
-    createUser,
-    updateUser,
-    deleteUser
-};*/

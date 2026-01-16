@@ -12,13 +12,53 @@ const productSchema = z.object({
 });
 
 const getProducts = async (req, res) => {
-    try {
+    const {
+        search,
+        category,
+        minRating,
+        maxRating,
+        sort = "latest",
+        page = 1,
+        limit = 5
+    } = req.query;
+    const query = {};
+    if (search) {
+        query.title = { $regex: search, $options: "i" };
+    }
+    if (category) {
+        query.category = category;
+    }
+    if (minRating || maxRating) {
+        query.rating = {};
+        if (minRating) query.rating.$gte = Number(minRating);
+        if (maxRating) query.rating.$lte = Number(maxRating);
+    }
+    let sortOption = {};
+    if (sort === "rating_high") sortOption = { rating: -1 };
+    else if (sort === "rating_low") sortOption = { rating: 1 };
+    else if (sort === "title_asc") sortOption = { title: 1 };
+    else if (sort === "title_desc") sortOption = { title: -1 };
+    else sortOption = { createdAt: -1 };
+
+    const skip = (page - 1) * limit;
+
+    const products = await Product.countDocuments(query);
+
+    res.json({
+        total: products,
+        page: Number(page),
+        page: Math.ceil(total / limit),
+        products
+    });
+}   ;
+
+    /*try {
         const products = await Product.find({});
         res.status(200).json(products);
     }catch (error) {
         res.status(500).json({message: error.message});
     }
-};
+};*/
 
 const getProduct = async (req, res) => {
 try {
