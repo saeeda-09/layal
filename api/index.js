@@ -24,9 +24,7 @@ app.get('/',(req,res) => {
     res.send("hello from node api");
 }); 
 
-
 require('dotenv').config(); 
-
 const CONNECTION_URI = process.env.MONGO_URI; 
 
 mongoose.connect(CONNECTION_URI) 
