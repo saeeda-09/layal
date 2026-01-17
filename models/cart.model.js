@@ -25,22 +25,11 @@ const cartSchema = new mongoose.Schema(
                 required: true,
                 min: 0
             },
-            name: {
-                type: String,
-                required: true
-            },
             image: {
                 type: String,
                 required: false
             }
         }],
-
-        totalPrice: {
-            type: Number,
-            required: true,
-            min: 0,
-            default: 0
-        },
 
         status: {
             type: String,
@@ -53,17 +42,5 @@ const cartSchema = new mongoose.Schema(
         timestamps: true 
     }
 );
-
-// Pre-save middleware to calculate totalPrice before saving
-cartSchema.pre("save", function (next) {
-    if (this.items && this.items.length > 0) {
-        this.totalPrice = this.items.reduce((total, item) => {
-            return total + (item.price * item.quantity);
-        }, 0);
-    } else {
-        this.totalPrice = 0;
-    }
-    next();
-});
 
 export default mongoose.model("Cart", cartSchema);

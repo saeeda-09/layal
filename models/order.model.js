@@ -31,12 +31,6 @@ const orderSchema = new mongoose.Schema(
             }
         }],
 
-        totalAmount: {
-            type: Number,
-            required: true,
-            min: 0
-        },
-
         shippingAddress: {
             street: {
                 type: String,
@@ -101,27 +95,5 @@ const orderSchema = new mongoose.Schema(
         timestamps: true 
     }
 );
-
-// Pre-save middleware to calculate totalAmount before saving
-orderSchema.pre("save", function (next) {
-    if (this.items && this.items.length > 0) {
-        this.totalAmount = this.items.reduce((total, item) => {
-            return total + (item.price * item.quantity);
-        }, 0);
-    } else {
-        this.totalAmount = 0;
-    }
-    next();
-});
-
-// Add instance method to update order status
-orderSchema.methods.updateStatus = function (newStatus) {
-    this.orderStatus = newStatus;
-    if (newStatus === "delivered") {
-        this.deliveryDate = new Date();
-    }
-    return this.save();
-};
-
 
 export default mongoose.model("Order", orderSchema);

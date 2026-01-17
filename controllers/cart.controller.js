@@ -9,14 +9,19 @@ const cartValidator = z.object({
         })),
 });
 
-// export const getCarts = async(req, res) => {
-//     try {
-//             const carts = await Cart.find({ userId: req.user.id });
-//             res.status(200).json(carts);    
-//     } catch (error) {
-//             res.status(500).json({message: error.message});
-//     }
-// }
+export const getCarts = async(req, res) => {
+    try {
+        const { page = 1,limit = 10 } = req.query;
+
+        const carts = await Cart.find({ userId: req.user.id })
+                .skip((page - 1) * limit)
+                .limit(Number(limit));
+
+        res.status(200).json(carts);    
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
 
 export const getCart = async (req, res) => {
         try {
@@ -34,7 +39,7 @@ export const getCart = async (req, res) => {
         } catch (error) {
                     res.status(500).json({message: error.message});
         }
-}
+};
 
 export const createCart = async (req, res) => {
         try {
@@ -64,7 +69,7 @@ export const createCart = async (req, res) => {
                 }
                 res.status(500).json({message: error.message})
         }
-}
+};
 
 export const updateCart = async (req, res) => {
         try {
@@ -72,7 +77,7 @@ export const updateCart = async (req, res) => {
 
                 const parsed = cartValidator.parse(req.body);
         
-                const cart = await Cart.findByIdAndUpdate(
+                const cart = await Cart.findOneAndUpdate(
                         {_id: id, userId: req.user.id},
                         {items: parsed.items},
                         {new: true}
@@ -82,15 +87,14 @@ export const updateCart = async (req, res) => {
                 return res.status(404).json({message: "Cart not found"});
         }
     
-        res.status(200).json(updatedCart);
-    
+        res.status(200).json(cart);
     } catch (error) {
         if(error instanceof z.ZodError){
                 return res.status(400).json({message: error.errors});
         }
         res.status(500).json({message: error.message});
     }
-}
+};
 
 export const deleteCart = async (req, res) => {
         try {
@@ -109,4 +113,4 @@ export const deleteCart = async (req, res) => {
         } catch (error) {
                 res.status(500).json({message: error.message});
         }
-}
+};

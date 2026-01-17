@@ -1,11 +1,14 @@
 import mongoose from 'mongoose';
+import bcrypt from "bcryptjs";
 
 const UserSchema = mongoose.Schema(
     {
         username: {
             type: String,
             required: [true, "Please enter a username"],
-            unique: true // Ensure usernames are unique
+            unique: true, // Ensure usernames are unique
+            minLength: 3,
+            trim: true
         },
 
         name: {
@@ -16,7 +19,9 @@ const UserSchema = mongoose.Schema(
         email: {
             type: String,
             required: [true, "Please enter an email"],
-            unique: true
+            unique: true,
+            lowercase: true,
+            trim: true
         },
 
         age: {
@@ -26,7 +31,8 @@ const UserSchema = mongoose.Schema(
 
         password: {
             type: String,
-            required: [true, "Please enter a password"]
+            required: [true, "Please enter a password"],
+            minLength: 4
         },
 
         address: {
@@ -37,7 +43,7 @@ const UserSchema = mongoose.Schema(
 
         role: {
             type: String, 
-            enum: ["user", "admin"],
+            enum: ["user", "admin", "seller"],
             default: "user"
         },
 
@@ -56,5 +62,16 @@ const UserSchema = mongoose.Schema(
         timestamps: true // Adds createdAt and updatedAt fields
     }
 );
+
+UserSchema.pre('save', async function() {
+    if(!this.isModified('password')) return;
+
+    const salt = await bcrypt.genSalt(10)
+    this.password = await bcrypt.hash(this.password, salt)
+})
+
+UserSchema.methods.comparePassword = async function (givenPassword) {
+    return await bcrypt.compare(givenPassword, this.password)
+}
 
 export default mongoose.model("User", UserSchema);

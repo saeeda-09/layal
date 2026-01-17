@@ -3,8 +3,24 @@ import Product from "../models/product.model.js"
 
 export const getProducts = async (req, res) => {
     try {
-        const products = await Product.find({});
-        res.status(200).json(products);
+        const {page = 1, limit = 10, search} = req.query;
+
+        const query = search
+        ? {name: {$regex: search, $options: "i"}}
+        : {};
+
+        const products = await Product.find(query)
+        .skip((page - 1) * limit)
+        .limit(Number(limit));
+
+        const total = await Product.countDocuments(query);
+        
+        res.status(200).json({
+            page: Number(page),
+            limit: Number(limit),
+            total, 
+            products
+        });
     }catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -40,7 +56,7 @@ export const updateProduct = async (req, res) => {
             return res.status(404).json({message:"Product not found!"});
         }
         const updateProduct = await Product.findById(id);
-        res.status(200).json(updatedProduct);
+        res.status(200).json(updateProduct);
     } catch (error){
         res.status(500).json({message: error.message});
     }
