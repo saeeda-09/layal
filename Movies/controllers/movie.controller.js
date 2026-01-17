@@ -25,7 +25,7 @@ const getMovies = async (req, res) => {
     const query = {};
 
     if (search) {
-        query.title = { $regex: search, $options: "i" };
+        query.name = { $regex: search, $options: "i" };
     }
 
     if (genres) {
@@ -100,7 +100,7 @@ const updateMovie = async (req, res) => {
 const deleteMovie = async (req, res) => {
     try {
         const { id } = req.params;
-        const Movie = await Movie.findByIdAndDelete(id);
+        const movie = await Movie.findByIdAndDelete(id);
 
         if (!movie) {
             return res.status(404).json({ message: "movie not found!" });

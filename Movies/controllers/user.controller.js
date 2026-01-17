@@ -11,6 +11,18 @@ const
          role: z.enum(['user', 'admin']).optional().default('user')
    });
 
+   const getProfile = async (req, res) => {
+    try {
+        // req.user is populated by the protect middleware
+        if (!req.user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(req.user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // Get all users
 const getUsers = async (req, res) => {
     try {
@@ -76,6 +88,7 @@ const deleteUser = async (req, res) => {
 
 
 module.exports = {
+    getProfile,
     getUsers,
     getUser,
     createUser,
