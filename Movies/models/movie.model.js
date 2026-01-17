@@ -11,10 +11,16 @@ const MovieSchema = mongoose.Schema(
     description: { 
         type: String
     },
-    category: {
+    genres: {
         type: String
     },
-    
+    rating: {
+        type: Number,
+        default: 0
+    },
+    releaseYear: {
+        type: Number
+    },
     image: {
         type: String,
         default: ""
