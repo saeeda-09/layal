@@ -17,9 +17,10 @@ const ProductSchema = mongoose.Schema(
     category: {
         type: String
     },
-    quantity: {
-        type: Number,
-        required: true
+    status: {
+        type: String,
+        enum: ['available', 'out_of_stock', 'discontinued'],
+        default: 'available'
     },
     image: {
         type: String,
