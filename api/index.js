@@ -6,6 +6,8 @@ const Product = require('./models/product.model.js');
 const productRoute = require("./routes/product.route.js");
 const User = require('./models/user.model.js');
 const userRoute = require('./routes/user.route.js');
+const waitlistModel = require('./models/waitlist.model.js');
+const waitlistRoute = require("./routes/waitlist.route.js");
 const app = express()
 
 //middleware
@@ -18,6 +20,7 @@ app.use(express.urlencoded({extended: false}));
 app.use('/api/auth', authRoutes);
 app.use('/api/products',productRoute);
 app.use('/api/users', userRoute);
+app.use('/api/waitlist', waitlistRoute);
 
 
 app.get('/',(req,res) => {
