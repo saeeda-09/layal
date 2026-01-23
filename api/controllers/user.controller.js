@@ -11,7 +11,7 @@ const
          role: z.enum(['user', 'admin']).optional().default('user')
    });
 
-// Get Logged-in User Profile
+
 const                    
    getProfile = async (req, res) => {
     try {

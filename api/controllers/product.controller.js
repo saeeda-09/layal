@@ -5,13 +5,14 @@ const { z } = require('zod');
 const productSchema = z.object({
     name: z.string().min(1, "Product name is required"),
     price: z.number().nonnegative("Price must be a non-negative number"),
-    quantity: z.number().int().nonnegative("Quantity must be a non-negative integer"),
+    status: z.enum(['available', 'out_of_stock', 'discontinued']).optional().default('available'),
     description: z.string().optional(),
     category: z.string().optional(),
     image: z.string().optional()
 });
 
 const getProducts = async (req, res) => {
+    try {
     const {
         search,
         category,
@@ -40,17 +41,20 @@ const getProducts = async (req, res) => {
     else if (sort === "title_desc") sortOption = { title: -1 };
     else sortOption = { createdAt: -1 };
 
-    const skip = (page - 1) * limit;
-
-    const products = await Product.countDocuments(query);
+    const skip = (Number(page) - 1) * Number(limit);
+    const total = await Product.countDocuments(query);
+    const products = await Product.find(query).sort(sortOption).skip(skip).limit(Number(limit));
 
     res.json({
-        total: products,
+        total,
         page: Number(page),
         page: Math.ceil(total / limit),
         products
     });
-}   ;
+} catch (error) {
+    res.status(500).json({message: error.message});
+}   
+};
 
     /*try {
         const products = await Product.find({});
