@@ -15,7 +15,6 @@ const {
 const {protect, admin } = require('../middlewares/auth.middleware.js');
 
 router.route('/').get(protect, admin, getUsers);
-// Define User routes
 router.get('/profile', protect, getProfile);
 router.get('/', getUsers);
 router.get('/:id', getUser);
