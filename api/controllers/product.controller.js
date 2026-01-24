@@ -1,5 +1,6 @@
 const                    
    Product = require('../models/product.model');
+const { notifyWaitlistUsers } = require('./waitlist.controller');
 const { z } = require('zod');
 
 const productSchema = z.object({
@@ -47,7 +48,7 @@ const getProducts = async (req, res) => {
 
     res.json({
         total,
-        page: Number(page),
+        CurrentPage: Number(page),
         page: Math.ceil(total / limit),
         products
     });
@@ -87,7 +88,13 @@ const createProduct = async(req,res) =>{
 const updateProduct = async (req, res) => {
     try {
         const {id} = req.params;
-        const updatedProduct = await Product.findByIdAndUpdate(id,req.body);
+        const updatedProduct = await Product.findByIdAndUpdate(id,req.body,{new:true});
+
+        if (updatedProduct.quantity > 0 || updatedProduct.status === 'available') {
+
+        } {
+            await notifyWaitlistUsers(id);
+        }
 
         if(!updatedProduct)
         {

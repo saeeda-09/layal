@@ -34,4 +34,32 @@ const getWaitlist = async (req, res) => {
     }
 };
 
-module.exports = { joinWaitlist, getWaitlist , getWaitingUsersByProduct};
+const notifyWaitlistUsers = async (productId) => {
+    try {
+        const result = await Waitlist.updateMany(
+            { productId, status: 'waiting' },
+            { $set: { status: 'notified' } }
+        );
+        
+        console.log(`Updated ${result.modifiedCount} users to notified status.`);
+    } catch (error) {
+        console.error(`Error notifying users for product ${productId}:`, error);
+    }
+};
+
+/*const notifyWaitlistUsers = async (productId) => {
+    try {
+        const waitingUsers = await Waitlist.find({ productId, status: 'waiting' });
+
+        for (const user of waitingUsers) {
+            console.log(`Notifying ${user.email} about product ${productId} availability.`);
+            user.status = 'notified';
+            await user.save();
+        }
+    } catch (error) {
+        console.error(`Error notifying waitlist users for product ${productId}:`, error);
+    }
+
+};*/
+
+module.exports = { joinWaitlist, getWaitlist , getWaitingUsersByProduct, notifyWaitlistUsers};
