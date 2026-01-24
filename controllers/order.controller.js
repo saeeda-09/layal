@@ -1,10 +1,19 @@
 import Order from "../models/order.model.js"
 import Cart from "../models/cart.model.js"
+import Product from "../models/product.model.js"
 import { z } from "zod";
 
 const orderValidator = z.object({
-   paymentMethod: z.string()
+  paymentMethod: z.string(),
+  shippingAddress: z.object({
+    street: z.string(),
+    city: z.string(),
+    state: z.string(),
+    zipCode: z.string(),
+    country: z.string().optional()
+  })
 });
+
 
 export const getOrders = async(req, res) => {
         try {
@@ -42,53 +51,53 @@ export const getOrder = async (req, res) => {
 };
 
 export const createOrder = async (req, res) => {
-        try {
-                const parsed = orderValidator.parse(req.body);
+  try {
+    const parsed = orderValidator.parse(req.body);
 
-                const cart = await Cart.findOne({userId: req.user.id});
+    const cart = await Cart.findOne({ userId: req.user.id });
 
-                if(!cart || cart.items.length === 0){
-                        return res.status(400).json({message: "Cart is empty"});
-                }
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ message: "Cart is empty" });
+    }
 
-                let totalamount = 0;
+    let totalamount = 0;
+    const items = [];
 
-                const items = [];
+    for (const item of cart.items) {
+      const product = await Product.findById(item.productId);
 
-                for (const item of cart.items) {
-                        const product = await Product.findById(item.productId);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
 
-                        if (!product) {
-                                return res.status(404).json({ message: "Product not found" });
-                        }
+      totalamount += item.quantity * product.price;
 
-                        totalamount += item.quantity * product.price;
+      items.push({
+        productId: product._id,
+        quantity: item.quantity,
+        price: product.price,
+        name: product.name
+      });
+    }
 
-                        items.push({
-                        productId: product._id,
-                        quantity: item.quantity,
-                        price: product.price,
-                        name: product.name
-                        });
-                }
+    const order = await Order.create({
+      userId: req.user.id,
+      items,
+      totalamount,
+      paymentMethod: parsed.paymentMethod,
+      shippingAddress: parsed.shippingAddress
+    });
 
-                const order = await Order.create({
-                        userId: req.user.id,
-                        items,
-                        totalamount,
-                        paymentMethod: parsed.paymentMethod
-                });
+    cart.items = [];
+    await cart.save();
 
-                cart.items = [];
-                await cart.save();
-
-                res.status(200).json(order);
-        } catch (error) {
-                if(error instanceof z.ZodError){
-                        return res.status(400).json({message: error.errors});
-                }
-                res.status(500).json({message: error.message});
-        }
+    res.status(201).json(order);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ message: error.errors });
+    }
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export const updateOrder = async (req, res) => {

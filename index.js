@@ -5,6 +5,7 @@ import userrouter from "./routes/user.route.js";
 import prodrouter from "./routes/product.route.js";
 import cartrouter from "./routes/cart.route.js";
 import orderrouter from "./routes/order.route.js";
+import wishlistrouter from "./routes/wishlist.route.js";
 import { connectDB } from "./config/database.js";
 import authrouter from "./routes/auth.route.js";
 import cookieParser from 'cookie-parser';
@@ -23,6 +24,7 @@ app.use('/api/users', userrouter);
 app.use('/api/products', prodrouter);
 app.use('/api/carts', cartrouter);
 app.use('/api/orders', orderrouter);
+app.use("/api/wishlist", wishlistrouter);
 
 app.get('/', (req, res) => {
     res.send("Hello from Fake Cake server");
